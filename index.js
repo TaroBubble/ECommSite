@@ -1,6 +1,10 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
+
+//using this will apply middleware parser to every route handler
+app.use(bodyParser.urlencoded({extended: true}));
 
 //watch for get requests, with a path of ./
 app.get('/', (request, response) => {
@@ -16,29 +20,12 @@ app.get('/', (request, response) => {
     `);
 });
 
-const formParser = (request, response, next) => {
-    if (request.method === 'POST') {
-        request.on('data', (data) => {
-            const parse = data.toString('utf8').split('&');
-            const formData = {};
-            for (let pair of parse) {
-                const [key, value] = pair.split('=');
-                formData[key] = value;
-            }
-            request.body = formData;
-            next();
-        });
-    } else {
-        next();
-    }
-}
-
-app.post('/', formParser , (request, response) => {
+app.post('/', (request, response) => {
     //parse form data
     //.on similar to addeventlistener, 
     console.log(request.body);
     response.send('acc created');
-})
+});
 
 app.listen(3000, () => {
     console.log('listening');
